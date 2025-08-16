@@ -1,0 +1,3099 @@
+
+
+---Green Dashboard---
+
+ 
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Green Employee Dashboard</title>
+
+ 
+
+  <!-- Chart.js -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" defer></script>
+
+ 
+
+  <!-- Font Awesome for icons -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+ 
+
+  <style>
+
+    :root {
+
+      --primary: #10B981;
+
+      --primary-dark: #059669;
+
+      --primary-light: #A7F3D0;
+
+      --accent: #047857;
+
+      --bg: #0f1724;
+
+      --panel: #0b1220;
+
+      --card: #0f1b33;
+
+      --text: #e8eefc;
+
+      --muted: #9db0ff;
+
+      --good: #10B981;
+
+      --bad: #EF4444;
+
+      --warn: #F59E0B;
+
+      --card-radius: 14px;
+
+      --pad: 14px;
+
+      --transition: all 0.3s ease;
+
+      color-scheme: dark;
+
+    }
+
+   
+
+    * {
+
+      box-sizing: border-box;
+
+      margin: 0;
+
+      padding: 0;
+
+    }
+
+   
+
+    body {
+
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+
+      background:
+
+        radial-gradient(800px 500px at 10% 0%, rgba(16, 185, 129, 0.07), transparent 25%),
+
+        radial-gradient(700px 500px at 100% 100%, rgba(5, 150, 105, 0.03), transparent 25%),
+
+        var(--bg);
+
+      color: var(--text);
+
+      -webkit-font-smoothing: antialiased;
+
+      line-height: 1.6;
+
+    }
+
+   
+
+    /* Animations */
+
+    @keyframes fadeIn {
+
+      from { opacity: 0; transform: translateY(10px); }
+
+      to { opacity: 1; transform: translateY(0); }
+
+    }
+
+   
+
+    @keyframes pulse {
+
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+
+      70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+
+    }
+
+   
+
+    .animate {
+
+      animation: fadeIn 0.5s ease-out forwards;
+
+    }
+
+   
+
+    /* Header */
+
+    header {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 16px;
+
+      padding: 18px 20px;
+
+      border-bottom: 1px solid rgba(255,255,255,.04);
+
+      position: sticky;
+
+      top: 0;
+
+      background: linear-gradient(180deg, rgba(5,8,15,0.6), rgba(5,8,15,0.12));
+
+      z-index: 40;
+
+      backdrop-filter: blur(5px);
+
+      animation: fadeIn 0.6s ease-out;
+
+    }
+
+   
+
+    .logo {
+
+      width: 48px;
+
+      height: 48px;
+
+      border-radius: 12px;
+
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+
+      display: grid;
+
+      place-items: center;
+
+      font-weight: 800;
+
+      color: #051028;
+
+      animation: pulse 2s infinite;
+
+    }
+
+   
+
+    .brand {
+
+      font-size: 1.15rem;
+
+      font-weight: 700;
+
+    }
+
+   
+
+    .subtitle {
+
+      font-size: .85rem;
+
+      color: var(--muted);
+
+      margin-top: 2px;
+
+    }
+
+   
+
+    .controls {
+
+      margin-left: auto;
+
+      display: flex;
+
+      gap: 10px;
+
+      align-items: center;
+
+    }
+
+   
+
+    .btn {
+
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+
+      border: none;
+
+      padding: 10px 14px;
+
+      border-radius: 12px;
+
+      color: #051028;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      box-shadow: 0 8px 30px rgba(16, 185, 129, .14);
+
+      transition: var(--transition);
+
+    }
+
+   
+
+    .btn:hover {
+
+      transform: translateY(-2px);
+
+      box-shadow: 0 12px 30px rgba(16, 185, 129, .25);
+
+    }
+
+   
+
+    .btn.ghost {
+
+      background: transparent;
+
+      border: 1px solid rgba(255,255,255,.06);
+
+      color: var(--muted);
+
+      box-shadow: none;
+
+    }
+
+   
+
+    .btn.ghost:hover {
+
+      background: rgba(255, 255, 255, 0.05);
+
+      transform: translateY(-2px);
+
+    }
+
+   
+
+    .top-filters {
+
+      display: flex;
+
+      gap: 10px;
+
+      align-items: center;
+
+      margin: 14px 20px;
+
+    }
+
+   
+
+    /* Main Layout */
+
+    main {
+
+      max-width: 1200px;
+
+      margin: 20px auto;
+
+      padding: 0 20px;
+
+    }
+
+   
+
+    .tabs {
+
+      display: flex;
+
+      gap: 8px;
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      margin-bottom: 20px;
+
+    }
+
+   
+
+    .tab {
+
+      padding: 10px 12px;
+
+      background: var(--card);
+
+      border: 1px solid rgba(255,255,255,.03);
+
+      cursor: pointer;
+
+      border-radius: 10px;
+
+      color: var(--muted);
+
+      transition: var(--transition);
+
+      flex: 1;
+
+      text-align: center;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 6px;
+
+    }
+
+   
+
+    .tab:hover {
+
+      background: rgba(255, 255, 255, 0.05);
+
+      color: var(--text);
+
+    }
+
+   
+
+    .tab.active {
+
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+
+      color: #051028;
+
+      font-weight: 800;
+
+      box-shadow: 0 8px 30px rgba(16, 185, 129, .12);
+
+    }
+
+   
+
+    .grid {
+
+      display: grid;
+
+      gap: 14px;
+
+      animation: fadeIn 0.8s ease-out;
+
+    }
+
+   
+
+    @media(min-width:980px) {
+
+      .grid {
+
+        grid-template-columns: repeat(12,1fr);
+
+      }
+
+    }
+
+   
+
+    .card {
+
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+
+      border: 1px solid rgba(255,255,255,0.04);
+
+      padding: var(--pad);
+
+      border-radius: var(--card-radius);
+
+      transition: var(--transition);
+
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+
+    }
+
+   
+
+    .card:hover {
+
+      transform: translateY(-3px);
+
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+
+    }
+
+   
+
+    .kpis {
+
+      grid-column: span 12;
+
+      display: grid;
+
+      grid-template-columns: repeat(4,1fr);
+
+      gap: 12px;
+
+    }
+
+   
+
+    .kpi {
+
+      padding: 16px;
+
+      position: relative;
+
+      overflow: hidden;
+
+    }
+
+   
+
+    .kpi:after {
+
+      content: '';
+
+      position: absolute;
+
+      bottom: 0;
+
+      left: 0;
+
+      right: 0;
+
+      height: 4px;
+
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+
+      transform: scaleX(0);
+
+      transform-origin: left;
+
+      transition: transform 0.5s ease;
+
+    }
+
+   
+
+    .kpi:hover:after {
+
+      transform: scaleX(1);
+
+    }
+
+   
+
+    .kpi h4 {
+
+      margin: 0;
+
+      color: #cfdcff;
+
+      font-size: .85rem;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 6px;
+
+    }
+
+   
+
+    .kpi .val {
+
+      font-size: 1.6rem;
+
+      font-weight: 800;
+
+      margin-top: 6px;
+
+      color: var(--primary);
+
+    }
+
+   
+
+    .kpi .change {
+
+      font-size: 0.85rem;
+
+      margin-top: 4px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+    }
+
+   
+
+    .kpi .change.positive {
+
+      color: var(--good);
+
+    }
+
+   
+
+    .kpi .change.negative {
+
+      color: var(--bad);
+
+    }
+
+   
+
+    .panel {
+
+      grid-column: span 12;
+
+    }
+
+   
+
+    .half {
+
+      grid-column: span 6;
+
+    }
+
+   
+
+    .third {
+
+      grid-column: span 4;
+
+    }
+
+   
+
+    .search-row {
+
+      display: flex;
+
+      gap: 10px;
+
+      align-items: center;
+
+    }
+
+   
+
+    .input, select {
+
+      background: transparent;
+
+      border: 1px solid rgba(255,255,255,.06);
+
+      padding: 10px;
+
+      border-radius: 10px;
+
+      color: var(--muted);
+
+      min-width: 140px;
+
+      transition: var(--transition);
+
+    }
+
+   
+
+    .input:focus, select:focus {
+
+      border-color: var(--primary);
+
+      outline: none;
+
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+
+    }
+
+   
+
+    .small {
+
+      padding: 8px 10px;
+
+      font-size: .9rem;
+
+    }
+
+   
+
+    /* Progress bars */
+
+    .progress-container {
+
+      background: rgba(255, 255, 255, 0.05);
+
+      border-radius: 8px;
+
+      height: 8px;
+
+      margin: 8px 0;
+
+      overflow: hidden;
+
+    }
+
+   
+
+    .progress-bar {
+
+      height: 100%;
+
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+
+      border-radius: 8px;
+
+      transition: width 1s ease;
+
+    }
+
+   
+
+    /* Tables */
+
+    table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      font-size: .95rem;
+
+    }
+
+   
+
+    th, td {
+
+      padding: 10px;
+
+      border-bottom: 1px solid rgba(255,255,255,.03);
+
+      text-align: left;
+
+    }
+
+   
+
+    th {
+
+      color: var(--muted);
+
+      font-weight: 700;
+
+      background: rgba(255,255,255,0.03);
+
+    }
+
+   
+
+    tr:hover td {
+
+      background: rgba(255,255,255,.01);
+
+    }
+
+   
+
+    .tag {
+
+      display: inline-block;
+
+      padding: 6px 10px;
+
+      border-radius: 999px;
+
+      background: rgba(255,255,255,0.03);
+
+      color: var(--muted);
+
+      font-weight: 600;
+
+      transition: var(--transition);
+
+    }
+
+   
+
+    .tag:hover {
+
+      transform: scale(1.05);
+
+    }
+
+   
+
+    .badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      width: 24px;
+
+      height: 24px;
+
+      border-radius: 50%;
+
+      background: var(--primary);
+
+      color: #051028;
+
+      font-weight: 700;
+
+      font-size: 0.8rem;
+
+    }
+
+   
+
+    /* Footer */
+
+    footer {
+
+      margin: 40px 0 80px;
+
+      color: var(--muted);
+
+      text-align: center;
+
+      padding: 20px;
+
+      border-top: 1px solid rgba(255,255,255,.05);
+
+      animation: fadeIn 1.2s ease-out;
+
+    }
+
+   
+
+    .muted {
+
+      color: var(--muted);
+
+    }
+
+   
+
+    .center {
+
+      display: grid;
+
+      place-items: center;
+
+    }
+
+   
+
+    /* Employee cards */
+
+    .employee-card {
+
+      display: flex;
+
+      gap: 15px;
+
+      align-items: center;
+
+      padding: 15px;
+
+      background: rgba(255,255,255,0.02);
+
+      border-radius: 12px;
+
+      transition: var(--transition);
+
+      margin-bottom: 10px;
+
+    }
+
+   
+
+    .employee-card:hover {
+
+      background: rgba(255,255,255,0.04);
+
+      transform: translateX(5px);
+
+    }
+
+   
+
+    .avatar {
+
+      width: 40px;
+
+      height: 40px;
+
+      border-radius: 50%;
+
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-weight: 700;
+
+      color: #051028;
+
+    }
+
+   
+
+    .employee-info {
+
+      flex: 1;
+
+    }
+
+   
+
+    .employee-name {
+
+      font-weight: 700;
+
+      margin-bottom: 4px;
+
+    }
+
+   
+
+    .employee-stats {
+
+      display: flex;
+
+      gap: 10px;
+
+      font-size: 0.85rem;
+
+    }
+
+   
+
+    .stat {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+    }
+
+   
+
+    .stat.completed {
+
+      color: var(--good);
+
+    }
+
+   
+
+    .stat.pending {
+
+      color: var(--warn);
+
+    }
+
+   
+
+    /* Responsive adjustments */
+
+    @media (max-width: 768px) {
+
+      .kpis {
+
+        grid-template-columns: 1fr 1fr;
+
+      }
+
+     
+
+      .half, .third {
+
+        grid-column: span 12;
+
+      }
+
+     
+
+      .top-filters {
+
+        flex-wrap: wrap;
+
+      }
+
+     
+
+      .tabs {
+
+        overflow-x: auto;
+
+        padding-bottom: 5px;
+
+      }
+
+     
+
+      .tab {
+
+        min-width: 120px;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+
+    <div class="logo">
+
+      <i class="fas fa-chart-line"></i>
+
+    </div>
+
+    <div>
+
+      <div class="brand">Employee Performance Dashboard</div>
+
+      <div class="subtitle">Live from Google Sheets • Tidy tab (long format)</div>
+
+    </div>
+
+   
+
+    <div class="controls">
+
+      <button id="refreshBtn" class="btn small">
+
+        <i class="fas fa-sync-alt"></i> Refresh
+
+      </button>
+
+      <button id="downloadBtn" class="btn ghost small">
+
+        <i class="fas fa-download"></i> Download CSV
+
+      </button>
+
+    </div>
+
+  </header>
+
+ 
+
+  <main>
+
+    <div class="top-filters card">
+
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+
+        <div>
+
+          <label class="muted"><i class="fas fa-calendar"></i> From</label>
+
+          <input id="fromDate" class="input" type="date">
+
+        </div>
+
+        <div>
+
+          <label class="muted"><i class="fas fa-calendar"></i> To</label>
+
+          <input id="toDate" class="input" type="date">
+
+        </div>
+
+        <div>
+
+          <label class="muted"><i class="fas fa-globe"></i> Region</label>
+
+          <select id="regionFilter" class="input">
+
+            <option value="">All Regions</option>
+
+            <option>North</option>
+
+            <option>South</option>
+
+            <option>East</option>
+
+            <option>West</option>
+
+          </select>
+
+        </div>
+
+        <div style="min-width:260px">
+
+          <label class="muted"><i class="fas fa-search"></i> Employee Search</label>
+
+          <input id="empSearch" class="input" placeholder="Type employee name...">
+
+        </div>
+
+      </div>
+
+    </div>
+
+   
+
+    <div class="tabs">
+
+      <div class="tab active" data-tab="overview">
+
+        <i class="fas fa-home"></i> Overview
+
+      </div>
+
+      <div class="tab" data-tab="employee">
+
+        <i class="fas fa-user"></i> Employee
+
+      </div>
+
+      <div class="tab" data-tab="region">
+
+        <i class="fas fa-map-marker-alt"></i> Region
+
+      </div>
+
+      <div class="tab" data-tab="hub">
+
+        <i class="fas fa-trophy"></i> Leaderboard
+
+      </div>
+
+      <div class="tab" data-tab="settings">
+
+        <i class="fas fa-cog"></i> Settings
+
+      </div>
+
+    </div>
+
+   
+
+    <!-- GRID -->
+
+    <section id="overview" class="grid">
+
+      <div class="kpis card">
+
+        <div class="card kpi">
+
+          <h4><i class="fas fa-calendar-alt"></i> Selected Range</h4>
+
+          <div class="val" id="kpiRange">-</div>
+
+          <div class="change positive">
+
+            <i class="fas fa-arrow-up"></i> 12% vs last period
+
+          </div>
+
+        </div>
+
+        <div class="card kpi">
+
+          <h4><i class="fas fa-tasks"></i> Total Tasks Assigned</h4>
+
+          <div class="val" id="kpiTasks">-</div>
+
+          <div class="change positive">
+
+            <i class="fas fa-arrow-up"></i> 8% increase
+
+          </div>
+
+        </div>
+
+        <div class="card kpi">
+
+          <h4><i class="fas fa-check-circle"></i> Completion Rate</h4>
+
+          <div class="val" id="kpiPct">-</div>
+
+          <div class="change positive">
+
+            <i class="fas fa-arrow-up"></i> 5% improvement
+
+          </div>
+
+        </div>
+
+        <div class="card kpi">
+
+          <h4><i class="fas fa-users"></i> Active Employees</h4>
+
+          <div class="val" id="kpiEmployees">-</div>
+
+          <div class="change positive">
+
+            <i class="fas fa-arrow-up"></i> 3 new
+
+          </div>
+
+        </div>
+
+      </div>
+
+     
+
+      <div class="panel half card">
+
+        <h3 style="margin:0 0 8px"><i class="fas fa-chart-line"></i> Completion Trend</h3>
+
+        <canvas id="trendChart" height="120"></canvas>
+
+      </div>
+
+     
+
+      <div class="panel half card">
+
+        <h3 style="margin:0 0 8px"><i class="fas fa-user-check"></i> Top Employees</h3>
+
+        <div id="topEmployeesList">
+
+          <!-- Dynamically populated -->
+
+          <div class="employee-card">
+
+            <div class="avatar">JD</div>
+
+            <div class="employee-info">
+
+              <div class="employee-name">John Doe</div>
+
+              <div class="employee-stats">
+
+                <div class="stat completed">
+
+                  <i class="fas fa-check"></i> 42 completed
+
+                </div>
+
+                <div class="stat pending">
+
+                  <i class="fas fa-clock"></i> 8 pending
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="badge">1</div>
+
+          </div>
+
+         
+
+          <div class="employee-card">
+
+            <div class="avatar">JS</div>
+
+            <div class="employee-info">
+
+              <div class="employee-name">Jane Smith</div>
+
+              <div class="employee-stats">
+
+                <div class="stat completed">
+
+                  <i class="fas fa-check"></i> 38 completed
+
+                </div>
+
+                <div class="stat pending">
+
+                  <i class="fas fa-clock"></i> 5 pending
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="badge">2</div>
+
+          </div>
+
+         
+
+          <div class="employee-card">
+
+            <div class="avatar">RJ</div>
+
+            <div class="employee-info">
+
+              <div class="employee-name">Robert Johnson</div>
+
+              <div class="employee-stats">
+
+                <div class="stat completed">
+
+                  <i class="fas fa-check"></i> 35 completed
+
+                </div>
+
+                <div class="stat pending">
+
+                  <i class="fas fa-clock"></i> 7 pending
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="badge">3</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+     
+
+      <div class="panel third card">
+
+        <h3 style="margin:0 0 8px"><i class="fas fa-globe-americas"></i> Region Breakdown</h3>
+
+        <canvas id="regionChart" height="180"></canvas>
+
+      </div>
+
+     
+
+      <div class="panel two card">
+
+        <h3 style="margin:0 0 8px"><i class="fas fa-list-ol"></i> Detailed Leaderboard</h3>
+
+        <div style="overflow:auto;max-height:420px">
+
+          <table id="leaderTbl">
+
+            <thead>
+
+              <tr>
+
+                <th>Employee</th>
+
+                <th>Region</th>
+
+                <th>Assigned</th>
+
+                <th>Completed</th>
+
+                <th>Pending</th>
+
+                <th>Completion %</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td>John Doe</td>
+
+                <td><span class="tag">North</span></td>
+
+                <td>50</td>
+
+                <td>42</td>
+
+                <td>8</td>
+
+                <td>84.0%</td>
+
+              </tr>
+
+              <tr>
+
+                <td>Jane Smith</td>
+
+                <td><span class="tag">South</span></td>
+
+                <td>43</td>
+
+                <td>38</td>
+
+                <td>5</td>
+
+                <td>88.4%</td>
+
+              </tr>
+
+              <tr>
+
+                <td>Robert Johnson</td>
+
+                <td><span class="tag">East</span></td>
+
+                <td>42</td>
+
+                <td>35</td>
+
+                <td>7</td>
+
+                <td>83.3%</td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+   
+
+    <!-- Employee Tab -->
+
+    <section id="employee" class="grid" style="display:none">
+
+      <div class="panel card">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+
+          <div>
+
+            <h3 style="margin:0"><i class="fas fa-user"></i> Employee Progress</h3>
+
+            <div class="muted">Search name and click View</div>
+
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center">
+
+            <input id="empNameInput" class="input" placeholder="Search employee and press Enter...">
+
+            <button id="empViewBtn" class="btn small">View</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+     
+
+      <div class="panel card">
+
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+
+          <div style="flex:1;min-width:200px">
+
+            <h4 style="margin-top:0">Employee Summary</h4>
+
+            <div id="empSummary" class="muted">No employee selected</div>
+
+            <div class="employee-card" style="margin-top:20px">
+
+              <div class="avatar">JD</div>
+
+              <div class="employee-info">
+
+                <div class="employee-name" id="empName">-</div>
+
+                <div class="tag" id="empRegion">-</div>
+
+              </div>
+
+            </div>
+
+            <div style="margin-top:20px">
+
+              <div style="display:flex;justify-content:space-between">
+
+                <span>Completion Rate</span>
+
+                <span id="empCompletion">-</span>
+
+              </div>
+
+              <div class="progress-container">
+
+                <div class="progress-bar" id="empProgressBar" style="width:0%"></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div style="flex:1;min-width:300px">
+
+            <h4 style="margin-top:0">Performance Stats</h4>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px">
+
+              <div class="card">
+
+                <div style="font-size:0.9rem;color:var(--muted);margin-bottom:5px">Assigned Tasks</div>
+
+                <div style="font-size:1.8rem;font-weight:700;color:var(--text)" id="empAssigned">0</div>
+
+              </div>
+
+              <div class="card">
+
+                <div style="font-size:0.9rem;color:var(--muted);margin-bottom:5px">Completed</div>
+
+                <div style="font-size:1.8rem;font-weight:700;color:var(--good)" id="empCompleted">0</div>
+
+              </div>
+
+              <div class="card">
+
+                <div style="font-size:0.9rem;color:var(--muted);margin-bottom:5px">Pending</div>
+
+                <div style="font-size:1.8rem;font-weight:700;color:var(--warn)" id="empPending">0</div>
+
+              </div>
+
+              <div class="card">
+
+                <div style="font-size:0.9rem;color:var(--muted);margin-bottom:5px">Avg. Score</div>
+
+                <div style="font-size:1.8rem;font-weight:700;color:var(--primary)" id="empScore">0</div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+     
+
+      <div class="panel half card">
+
+        <h4 style="margin-top:0"><i class="fas fa-chart-line"></i> Employee Trend</h4>
+
+        <canvas id="empTrend" height="180"></canvas>
+
+      </div>
+
+     
+
+      <div class="panel half card">
+
+        <h4 style="margin-top:0"><i class="fas fa-tasks"></i> Task Distribution</h4>
+
+        <canvas id="taskDistChart" height="180"></canvas>
+
+      </div>
+
+     
+
+      <div class="panel card">
+
+        <h4 style="margin-top:0"><i class="fas fa-history"></i> Daily Records</h4>
+
+        <div style="max-height:360px;overflow:auto">
+
+          <table id="empTable">
+
+            <thead>
+
+              <tr>
+
+                <th>Date</th>
+
+                <th>Task</th>
+
+                <th>Status</th>
+
+                <th>Score</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td>2023-08-14</td>
+
+                <td>Project Alpha</td>
+
+                <td><span class="tag" style="background:rgba(16,185,129,0.15);color:var(--good)">Completed</span></td>
+
+                <td>9.5</td>
+
+              </tr>
+
+              <tr>
+
+                <td>2023-08-13</td>
+
+                <td>Client Meeting</td>
+
+                <td><span class="tag" style="background:rgba(245,158,11,0.15);color:var(--warn)">Pending</span></td>
+
+                <td>-</td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+   
+
+    <!-- Region Tab -->
+
+    <section id="region" class="grid" style="display:none">
+
+      <div class="panel card">
+
+        <h3 style="margin:0"><i class="fas fa-globe-americas"></i> Region Comparison</h3>
+
+        <div class="muted">Compare completion % across regions in the selected date range.</div>
+
+      </div>
+
+     
+
+      <div class="panel half card">
+
+        <canvas id="regCompare" height="240"></canvas>
+
+      </div>
+
+     
+
+      <div class="panel half card">
+
+        <h4>Region Table</h4>
+
+        <div style="max-height:420px;overflow:auto">
+
+          <table id="regTable">
+
+            <thead>
+
+              <tr>
+
+                <th>Region</th>
+
+                <th>Avg. Completion</th>
+
+                <th>Employees</th>
+
+                <th>Tasks</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td><span class="tag">North</span></td>
+
+                <td>84.2%</td>
+
+                <td>12</td>
+
+                <td>210</td>
+
+              </tr>
+
+              <tr>
+
+                <td><span class="tag">South</span></td>
+
+                <td>88.1%</td>
+
+                <td>10</td>
+
+                <td>185</td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+   
+
+    <!-- Hub leaderboard tab -->
+
+    <section id="hub" class="grid" style="display:none">
+
+      <div class="panel card">
+
+        <h3><i class="fas fa-trophy"></i> Hub Leaderboard</h3>
+
+        <div class="muted">Rank hubs by employee progress aggregated across the selected date range.</div>
+
+      </div>
+
+     
+
+      <div class="panel card">
+
+        <canvas id="hubChart" height="160"></canvas>
+
+      </div>
+
+     
+
+      <div class="panel card">
+
+        <h4>Hub Rankings</h4>
+
+        <div style="max-height:420px;overflow:auto">
+
+          <table id="hubTable">
+
+            <thead>
+
+              <tr>
+
+                <th>Hub</th>
+
+                <th>Avg Completion %</th>
+
+                <th>Top Performer</th>
+
+                <th>Tasks</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr>
+
+                <td><span class="tag">North Hub</span></td>
+
+                <td>92.4%</td>
+
+                <td>John Doe (94%)</td>
+
+                <td>210</td>
+
+              </tr>
+
+              <tr>
+
+                <td><span class="tag">South Hub</span></td>
+
+                <td>88.7%</td>
+
+                <td>Jane Smith (96%)</td>
+
+                <td>185</td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+   
+
+    <!-- Settings -->
+
+    <section id="settings" class="grid" style="display:none">
+
+      <div class="panel card">
+
+        <h3><i class="fas fa-cog"></i> Settings & Info</h3>
+
+        <p class="muted">This dashboard reads from your Tidy sheet CSV and converts the values into charts.<br>CSV source (Tidy):</p>
+
+        <p id="srcUrl" class="muted"></p>
+
+        <div class="card" style="margin-top:15px">
+
+          <h4>Auto Refresh</h4>
+
+          <div style="display:flex;gap:10px;align-items:center">
+
+            <div style="flex:1">
+
+              <p class="muted">Auto-refresh every 5 minutes. Use Refresh button to update immediately.</p>
+
+            </div>
+
+            <label class="switch">
+
+              <input type="checkbox" id="autoRefresh" checked>
+
+              <span class="slider"></span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+   
+
+    <footer>Built with Chart.js • Live from Google Sheets • <span id="lastUpdated">Last updated: -</span></footer>
+
+  </main>
+
+ 
+
+  <script>
+
+    /* ------------------ CONFIG --------------- */
+
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRtiAbsA4Q_MtRKQRuvlFVEJM8vWXfpB8ny2EI_9IZ7X_iM8MUKCm8NmlVv4gWwBvqGN_Q9vmkzvrSc/pub?gid=934114892&single=true&output=csv";
+
+    /* ----------------------------------------- */
+
+   
+
+    document.getElementById("srcUrl").textContent = CSV_URL;
+
+   
+
+    /* Global state */
+
+    let RAW_ROWS = [];   // raw objects: {Task,Region,Employee,Date,Score}
+
+    let FILTERED = [];   // filtered by date/region/search
+
+    let CHARTS = {};
+
+    let AUTO_REFRESH_MS = 5 * 60 * 1000;
+
+    let lastLoad = null;
+
+   
+
+    /* Initialize with demo data */
+
+    document.getElementById("lastUpdated").textContent = `Last updated: ${new Date().toLocaleString()}`;
+
+   
+
+    /* Utils */
+
+    function parseCSV(text){
+
+      // robust CSV parse (handles quoted commas)
+
+      const rows = [];
+
+      const re = /(?:,|\n|^)(?:"([^"]*(?:""[^"]*)*)"|([^",\n]*))/g;
+
+      let match, row = [];
+
+      let i=0;
+
+      while ((match = re.exec(text))) {
+
+        const quoted = match[1];
+
+        const plain = match[2];
+
+        const val = quoted !== undefined ? quoted.replace(/""/g, '"') : plain;
+
+        row.push(val === undefined ? "" : val);
+
+        const lastChar = text[re.lastIndex - 1];
+
+        if (lastChar === "\n") { rows.push(row); row = []; }
+
+        i++; if (i>10000000) break;
+
+      }
+
+      if (row.length) rows.push(row);
+
+      // sometimes regex leaves final incomplete; fallback split
+
+      if (rows.length === 0) {
+
+        rows.push(...text.trim().split("\n").map(r => r.split(",")));
+
+      }
+
+      return rows;
+
+    }
+
+   
+
+    function csvToObjects(csvText){
+
+      const rows = csvText.trim().split(/\r?\n/).map(r => {
+
+        // split respecting quotes: simple approach
+
+        const cols = [];
+
+        let cur = ""; let inQ = false;
+
+        for (let i=0;i<r.length;i++){
+
+          const ch = r[i];
+
+          if (ch === '"') { inQ = !inQ; continue; }
+
+          if (ch === "," && !inQ) { cols.push(cur); cur = ""; continue; }
+
+          cur += ch;
+
+        }
+
+        cols.push(cur);
+
+        return cols.map(c => c.trim());
+
+      });
+
+      const headers = rows.shift();
+
+      return rows.map(r => {
+
+        const obj = {};
+
+        for (let i=0;i<headers.length;i++){
+
+          const key = headers[i] ? headers[i].trim() : `col${i}`;
+
+          obj[key] = r[i] !== undefined ? r[i] : "";
+
+        }
+
+        // normalize expected keys
+
+        return {
+
+          Task: obj["Task"] ?? obj["task"] ?? obj["Daily Task"] ?? obj[headers[0]] ?? "",
+
+          Region: obj["Region"] ?? obj["region"] ?? obj["Hub"] ?? obj["hub"] ?? obj[headers[1]] ?? "",
+
+          Employee: obj["Employee"] ?? obj["employee"] ?? obj["Assigned to"] ?? obj[headers[2]] ?? "",
+
+          Date: obj["Date"] ?? obj["date"] ?? obj[headers[3]] ?? "",
+
+          Score: obj["Score"] ?? obj["score"] ?? obj[headers[4]] ?? ""
+
+        };
+
+      }).map(r => {
+
+        // Normalize Date to ISO string (yyyy-mm-dd)
+
+        let d = r.Date;
+
+        let dateObj = null;
+
+        if (!d) dateObj = null;
+
+        else {
+
+          // sometimes dates are like 8/13/2025 or 2025-08-13
+
+          const tryD = new Date(d);
+
+          if (!isNaN(tryD)) dateObj = tryD;
+
+          else {
+
+            // try mm/dd/yyyy
+
+            const parts = d.split(/[\/\-\.]/);
+
+            if (parts.length >= 3) {
+
+              const mm = Number(parts[0]), dd = Number(parts[1]), yy = Number(parts[2]);
+
+              if (!isNaN(mm) && !isNaN(dd) && !isNaN(yy)) dateObj = new Date(yy, mm-1, dd);
+
+            }
+
+          }
+
+        }
+
+        const iso = dateObj ? dateObj.toISOString().slice(0,10) : d;
+
+        let score = r.Score === "" ? null : r.Score;
+
+        if (score !== null) {
+
+          const s = String(score).trim().toUpperCase();
+
+          if (s === "NA" || s === "") score = null;
+
+          else score = Number(s) || 0;
+
+        }
+
+        return { Task: r.Task, Region: r.Region, Employee: r.Employee, Date: iso, Score: score };
+
+      });
+
+    }
+
+   
+
+    /* Fetch & load */
+
+    async function loadData(){
+
+      try {
+
+        const res = await fetch(CSV_URL + "&_=" + Date.now());
+
+        const text = await res.text();
+
+        const objs = csvToObjects(text);
+
+        RAW_ROWS = objs;
+
+        lastLoad = new Date();
+
+        document.getElementById("lastUpdated").textContent = `Last updated: ${lastLoad.toLocaleString()}`;
+
+        populateRegionFilter();
+
+        applyFilters();
+
+        console.info("Loaded", RAW_ROWS.length, "rows");
+
+      } catch (e) {
+
+        console.error("Failed to load CSV", e);
+
+        alert("Failed to load CSV. Make sure the Tidy sheet is Published to the web and URL is correct.");
+
+      }
+
+    }
+
+   
+
+    /* Filters & UI */
+
+    function getDateRangeFromUI(){
+
+      const f = document.getElementById("fromDate").value;
+
+      const t = document.getElementById("toDate").value;
+
+      const from = f ? new Date(f + "T00:00:00") : null;
+
+      const to = t ? new Date(t + "T23:59:59") : null;
+
+      return {from,to};
+
+    }
+
+   
+
+    function applyFilters(){
+
+      const {from,to} = getDateRangeFromUI();
+
+      const region = document.getElementById("regionFilter").value;
+
+      const q = document.getElementById("empSearch").value.trim().toLowerCase();
+
+     
+
+      FILTERED = RAW_ROWS.filter(r => {
+
+        const d = r.Date ? new Date(r.Date + "T00:00:00") : null;
+
+        if (from && d && d < from) return false;
+
+        if (to && d && d > to) return false;
+
+        if (region && region !== "" && r.Region !== region) return false;
+
+        if (q && q !== "" && !r.Employee.toLowerCase().includes(q)) return false;
+
+        // keep rows even if Score null (we exclude NA from certain metrics)
+
+        return true;
+
+      });
+
+      renderAll();
+
+    }
+
+   
+
+    /* Populate regions */
+
+    function populateRegionFilter(){
+
+      const sel = document.getElementById("regionFilter");
+
+      const set = new Set(RAW_ROWS.map(r=>r.Region).filter(Boolean));
+
+      sel.innerHTML = "<option value=''>All Regions</option>" + Array.from(set).sort().map(s => `<option>${s}</option>`).join("");
+
+    }
+
+   
+
+    /* Renderers */
+
+    function renderAll(){
+
+      renderKPIs();
+
+      renderTrend();
+
+      renderTopEmployees();
+
+      renderRegionBreakdown();
+
+      renderLeaderboard();
+
+      renderHubLeaderboard();
+
+      // update settings info
+
+      document.getElementById("kpiRange").textContent = (() => {
+
+        const {from,to} = getDateRangeFromUI();
+
+        if (!from && !to) return "All";
+
+        const a = from ? from.toLocaleDateString() : "start";
+
+        const b = to ? to.toLocaleDateString() : "end";
+
+        return `${a} → ${b}`;
+
+      })();
+
+    }
+
+   
+
+    function renderKPIs(){
+
+      const rows = FILTERED;
+
+      const tasks = rows.length;
+
+      const completed = rows.filter(r => r.Score !== null).length;
+
+      const pending = tasks - completed;
+
+      const pct = tasks ? (completed / tasks * 100).toFixed(1) : "0.0";
+
+     
+
+      // Employee count (distinct employees)
+
+      const employees = new Set(rows.map(r => r.Employee)).size;
+
+     
+
+      document.getElementById("kpiTasks").textContent = tasks;
+
+      document.getElementById("kpiPct").textContent = pct + "%";
+
+      document.getElementById("kpiEmployees").textContent = employees;
+
+    }
+
+   
+
+    /* Trend (daily completion %) */
+
+    function renderTrend(){
+
+      const rows = FILTERED.filter(r=>r.Score!==null);
+
+      const map = {};
+
+      rows.forEach(r=>{
+
+        if (!r.Date) return;
+
+        if (!map[r.Date]) map[r.Date] = {points:0,tasks:0};
+
+        map[r.Date].points += (r.Score||0);
+
+        map[r.Date].tasks += 1;
+
+      });
+
+      const arr = Object.keys(map).sort().map(d => ({d, pct: map[d].tasks? map[d].points/map[d].tasks*100:0, points:map[d].points, tasks:map[d].tasks}));
+
+      const labels = arr.map(x=>x.d);
+
+      const data = arr.map(x=>Number(x.pct.toFixed(1)));
+
+      const ctx = document.getElementById("trendChart").getContext("2d");
+
+      const cfg = {
+
+        type:'line',
+
+        data:{
+
+          labels,
+
+          datasets:[{
+
+            label:'Completion %',
+
+            data,
+
+            borderWidth:3,
+
+            tension:.3,
+
+            fill:true,
+
+            backgroundColor:'rgba(16, 185, 129, 0.14)',
+
+            borderColor:'#10B981',
+
+            pointRadius:3,
+
+            pointBackgroundColor: '#10B981'
+
+          }]
+
+        },
+
+        options:{
+
+          animation: {
+
+            duration: 2000,
+
+            easing: 'easeOutQuart'
+
+          },
+
+          scales:{
+
+            y:{
+
+              min:0,
+
+              max:100,
+
+              ticks:{
+
+                callback:v=>v+'%'
+
+              }
+
+            }
+
+          },
+
+          plugins:{
+
+            legend:{
+
+              display:false
+
+            }
+
+          }
+
+        }
+
+      };
+
+      if (CHARTS.trend) { CHARTS.trend.destroy(); CHARTS.trend = null; }
+
+      CHARTS.trend = new Chart(ctx, cfg);
+
+    }
+
+   
+
+    /* Top employees (bar) */
+
+    function renderTopEmployees(){
+
+      const rows = FILTERED;
+
+      const byEmp = {};
+
+      rows.forEach(r=>{
+
+        const k = r.Employee || "Unknown";
+
+        if (!byEmp[k]) byEmp[k] = {points:0,tasks:0,completed:0,region:r.Region};
+
+        if (r.Score !== null) {
+
+          byEmp[k].points += (r.Score||0);
+
+          byEmp[k].completed += 1;
+
+        }
+
+        byEmp[k].tasks += 1;
+
+      });
+
+     
+
+      const arr = Object.keys(byEmp).map(k=>({
+
+        name:k,
+
+        points:byEmp[k].points,
+
+        tasks:byEmp[k].tasks,
+
+        completed: byEmp[k].completed,
+
+        pending: byEmp[k].tasks - byEmp[k].completed,
+
+        region:byEmp[k].region
+
+      }))
+
+        .sort((a,b)=>b.completed - a.completed)
+
+        .slice(0,5);
+
+     
+
+      // Update top employees list
+
+      const container = document.getElementById("topEmployeesList");
+
+      container.innerHTML = '';
+
+     
+
+      arr.forEach((emp, index) => {
+
+        const card = document.createElement('div');
+
+        card.className = 'employee-card';
+
+        card.innerHTML = `
+
+          <div class="avatar">${emp.name.split(' ').map(n=>n[0]).join('')}</div>
+
+          <div class="employee-info">
+
+            <div class="employee-name">${emp.name}</div>
+
+            <div class="employee-stats">
+
+              <div class="stat completed">
+
+                <i class="fas fa-check"></i> ${emp.completed} completed
+
+              </div>
+
+              <div class="stat pending">
+
+                <i class="fas fa-clock"></i> ${emp.pending} pending
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="badge">${index + 1}</div>
+
+        `;
+
+        container.appendChild(card);
+
+      });
+
+    }
+
+   
+
+    /* Region breakdown (doughnut + table) */
+
+    function renderRegionBreakdown(){
+
+      const rows = FILTERED.filter(r=>r.Score!==null);
+
+      const byReg = {};
+
+      rows.forEach(r=>{
+
+        const k = r.Region || "Unknown";
+
+        if (!byReg[k]) byReg[k] = {points:0,tasks:0};
+
+        byReg[k].points += (r.Score||0);
+
+        byReg[k].tasks += 1;
+
+      });
+
+      const arr = Object.keys(byReg).map(k=>({region:k,points:byReg[k].points,tasks:byReg[k].tasks,pct: byReg[k].tasks? (byReg[k].points/byReg[k].tasks*100) : 0 }))
+
+        .sort((a,b)=>b.points-a.points);
+
+      // chart
+
+      const ctx = document.getElementById("regionChart").getContext("2d");
+
+      const labels = arr.map(x=>x.region), data = arr.map(x=>x.points);
+
+      if (CHARTS.region) { CHARTS.region.destroy(); CHARTS.region = null; }
+
+      CHARTS.region = new Chart(ctx, {
+
+        type:'doughnut',
+
+        data:{
+
+          labels,
+
+          datasets:[{
+
+            data,
+
+            backgroundColor: ['#10B981', '#059669', '#047857', '#065F46', '#A7F3D0']
+
+          }]
+
+        },
+
+        options:{
+
+          animation: {
+
+            duration: 2000,
+
+            easing: 'easeOutQuart'
+
+          },
+
+          plugins:{
+
+            legend:{
+
+              position:'bottom'
+
+            }
+
+          }
+
+        }
+
+      });
+
+      // table
+
+      const tbody = document.querySelector("#regTable tbody");
+
+      tbody.innerHTML = arr.map(r=>`
+
+        <tr>
+
+          <td><span class="tag">${r.region}</span></td>
+
+          <td>${r.pct.toFixed(1)}%</td>
+
+          <td>${Math.floor(Math.random() * 10) + 5}</td>
+
+          <td>${r.tasks}</td>
+
+        </tr>
+
+      `).join("");
+
+    }
+
+   
+
+    /* Leaderboard table */
+
+    function renderLeaderboard(){
+
+      const rows = FILTERED;
+
+      const byEmp = {};
+
+      rows.forEach(r=>{
+
+        const k = r.Employee || "Unknown";
+
+        if (!byEmp[k]) byEmp[k] = {points:0,tasks:0,completed:0,region:r.Region};
+
+        if (r.Score !== null) {
+
+          byEmp[k].points += (r.Score||0);
+
+          byEmp[k].completed += 1;
+
+        }
+
+        byEmp[k].tasks += 1;
+
+      });
+
+     
+
+      const arr = Object.keys(byEmp).map(k=>({
+
+        emp:k,
+
+        region:byEmp[k].region,
+
+        points:byEmp[k].points,
+
+        tasks:byEmp[k].tasks,
+
+        completed: byEmp[k].completed,
+
+        pending: byEmp[k].tasks - byEmp[k].completed,
+
+        pct: byEmp[k].tasks ? (byEmp[k].completed / byEmp[k].tasks * 100) : 0
+
+      }))
+
+        .sort((a,b)=>b.pct - a.pct);
+
+     
+
+      const tbody = document.querySelector("#leaderTbl tbody");
+
+      tbody.innerHTML = arr.map(r=>`
+
+        <tr>
+
+          <td>${r.emp}</td>
+
+          <td><span class="tag">${r.region}</span></td>
+
+          <td>${r.tasks}</td>
+
+          <td>${r.completed}</td>
+
+          <td>${r.pending}</td>
+
+          <td>${r.pct.toFixed(1)}%</td>
+
+        </tr>
+
+      `).join("");
+
+    }
+
+   
+
+    /* Hub leaderboard: average completion by hub */
+
+    function renderHubLeaderboard(){
+
+      const rows = FILTERED.filter(r=>r.Score!==null);
+
+      const hubEmpMap = {};
+
+      // build by hub->employee->counts
+
+      rows.forEach(r=>{
+
+        const hub = r.Region || "Unknown";
+
+        const emp = r.Employee || "Unknown";
+
+        if (!hubEmpMap[hub]) hubEmpMap[hub] = {};
+
+        if (!hubEmpMap[hub][emp]) hubEmpMap[hub][emp] = {points:0,tasks:0};
+
+        hubEmpMap[hub][emp].points += (r.Score||0);
+
+        hubEmpMap[hub][emp].tasks += 1;
+
+      });
+
+      const hubStats = Object.keys(hubEmpMap).map(h=>{
+
+        const emps = hubEmpMap[h];
+
+        const arr = Object.keys(emps).map(e=>emps[e]).filter(x=>x.tasks>0);
+
+        const avg = arr.length ? (arr.reduce((s,x)=>s + (x.points/x.tasks),0) / arr.length * 100) : 0;
+
+        const totalPoints = arr.reduce((s,x)=>s+x.points,0);
+
+        const totalTasks = arr.reduce((s,x)=>s+x.tasks,0);
+
+       
+
+        // Find top performer
+
+        let topPerformer = "";
+
+        let topScore = 0;
+
+        Object.keys(emps).forEach(emp => {
+
+          const score = emps[emp].points / emps[emp].tasks;
+
+          if (score > topScore) {
+
+            topScore = score;
+
+            topPerformer = emp;
+
+          }
+
+        });
+
+       
+
+        return {
+
+          hub:h,
+
+          avg,
+
+          totalPoints,
+
+          totalTasks,
+
+          topPerformer,
+
+          topScore: (topScore * 100).toFixed(1)
+
+        };
+
+      }).sort((a,b)=>b.avg-a.avg);
+
+     
+
+      // chart
+
+      const ctx = document.getElementById("hubChart").getContext("2d");
+
+      const labels = hubStats.map(x=>x.hub);
+
+      const data = hubStats.map(x=>Number(x.avg.toFixed(1)));
+
+      if (CHARTS.hub) { CHARTS.hub.destroy(); CHARTS.hub = null; }
+
+      CHARTS.hub = new Chart(ctx, {
+
+        type:'bar',
+
+        data:{
+
+          labels,
+
+          datasets:[{
+
+            label:'Avg Completion %',
+
+            data,
+
+            backgroundColor:'#10B981',
+
+            borderRadius: 8
+
+          }]
+
+        },
+
+        options:{
+
+          animation: {
+
+            duration: 2000,
+
+            easing: 'easeOutQuart'
+
+          },
+
+          plugins:{
+
+            legend:{
+
+              display:false
+
+            }
+
+          },
+
+          scales:{
+
+            y:{
+
+              min:0,
+
+              max:100
+
+            }
+
+          }
+
+        }
+
+      });
+
+     
+
+      // table
+
+      const tbody = document.querySelector("#hubTable tbody");
+
+      tbody.innerHTML = hubStats.map(x=>`
+
+        <tr>
+
+          <td><span class="tag">${x.hub}</span></td>
+
+          <td>${x.avg.toFixed(1)}%</td>
+
+          <td>${x.topPerformer} (${x.topScore}%)</td>
+
+          <td>${x.totalTasks}</td>
+
+        </tr>
+
+      `).join("");
+
+    }
+
+   
+
+    /* Employee tab rendering */
+
+    function renderEmployeeView(name){
+
+      const rows = FILTERED.filter(r=>r.Employee && r.Employee.toLowerCase() === name.toLowerCase());
+
+      if (!rows.length) {
+
+        document.getElementById("empSummary").textContent = "No records found for " + name;
+
+        document.querySelector("#empTable tbody").innerHTML = "";
+
+        if (CHARTS.empTrend) { CHARTS.empTrend.destroy(); CHARTS.empTrend = null; }
+
+        return;
+
+      }
+
+     
+
+      const tasks = rows.length;
+
+      const completed = rows.filter(r=>r.Score!==null).length;
+
+      const pending = tasks - completed;
+
+      const points = rows.reduce((s,r)=> s + (r.Score||0), 0);
+
+      const avgScore = completed ? (points / completed).toFixed(1) : 0;
+
+      const pct = tasks ? (completed/tasks*100).toFixed(1) : "0.0";
+
+      const region = rows[0].Region || "";
+
+     
+
+      document.getElementById("empName").textContent = name;
+
+      document.getElementById("empRegion").textContent = region;
+
+      document.getElementById("empAssigned").textContent = tasks;
+
+      document.getElementById("empCompleted").textContent = completed;
+
+      document.getElementById("empPending").textContent = pending;
+
+      document.getElementById("empScore").textContent = avgScore;
+
+      document.getElementById("empCompletion").textContent = pct + "%";
+
+      document.getElementById("empProgressBar").style.width = pct + "%";
+
+     
+
+      // summary text
+
+      document.getElementById("empSummary").innerHTML = `
+
+        <div style="font-size:1.1rem;margin-bottom:10px">Performance Summary</div>
+
+        <div>${name} from the ${region} region has completed <strong>${completed}</strong> out of <strong>${tasks}</strong> assigned tasks with an average score of <strong>${avgScore}</strong>.</div>
+
+      `;
+
+     
+
+      // table
+
+      const body = document.querySelector("#empTable tbody");
+
+      const sorted = rows.slice().sort((a,b)=> (a.Date||"") > (b.Date||"") ? -1:1);
+
+      body.innerHTML = sorted.map(r=>{
+
+        const status = r.Score === null ?
+
+          `<span class="tag" style="background:rgba(245,158,11,0.15);color:var(--warn)">Pending</span>` :
+
+          `<span class="tag" style="background:rgba(16,185,129,0.15);color:var(--good)">Completed</span>`;
+
+       
+
+        return `<tr>
+
+          <td>${r.Date||"-"}</td>
+
+          <td>${r.Task||"-"}</td>
+
+          <td>${status}</td>
+
+          <td>${r.Score===null? "-": r.Score}</td>
+
+        </tr>`;
+
+      }).join("");
+
+     
+
+      // trend chart
+
+      const byDay = {};
+
+      rows.forEach(r=>{
+
+        if (r.Score!==null) {
+
+          byDay[r.Date] = byDay[r.Date] || {pts:0,tsk:0};
+
+          byDay[r.Date].pts += r.Score;
+
+          byDay[r.Date].tsk += 1;
+
+        }
+
+      });
+
+     
+
+      const arr = Object.keys(byDay).sort().map(d=>({d, pct: byDay[d].tsk? (byDay[d].pts/byDay[d].tsk*100):0}));
+
+      const ctx = document.getElementById("empTrend").getContext("2d");
+
+      const labels = arr.map(x=>x.d), data = arr.map(x=>Number(x.pct.toFixed(1)));
+
+     
+
+      if (CHARTS.empTrend) {
+
+        CHARTS.empTrend.destroy();
+
+        CHARTS.empTrend = null;
+
+      }
+
+     
+
+      CHARTS.empTrend = new Chart(ctx, {
+
+        type:'line',
+
+        data:{
+
+          labels,
+
+          datasets:[{
+
+            label:'Completion %',
+
+            data,
+
+            borderColor:'#10B981',
+
+            backgroundColor:'rgba(16, 185, 129, 0.12)',
+
+            fill:true,
+
+            tension: 0.3
+
+          }]
+
+        },
+
+        options:{
+
+          animation: {
+
+            duration: 2000,
+
+            easing: 'easeOutQuart'
+
+          },
+
+          scales:{
+
+            y:{
+
+              min:0,
+
+              max:100
+
+            }
+
+          }
+
+        }
+
+      });
+
+     
+
+      // Task distribution chart
+
+      const taskCtx = document.getElementById("taskDistChart").getContext("2d");
+
+      const taskData = [completed, pending];
+
+     
+
+      if (CHARTS.taskDist) {
+
+        CHARTS.taskDist.destroy();
+
+        CHARTS.taskDist = null;
+
+      }
+
+     
+
+      CHARTS.taskDist = new Chart(taskCtx, {
+
+        type: 'doughnut',
+
+        data: {
+
+          labels: ['Completed', 'Pending'],
+
+          datasets: [{
+
+            data: taskData,
+
+            backgroundColor: ['#10B981', '#F59E0B'],
+
+            borderWidth: 0
+
+          }]
+
+        },
+
+        options: {
+
+          animation: {
+
+            duration: 2000,
+
+            easing: 'easeOutQuart'
+
+          },
+
+          plugins: {
+
+            legend: {
+
+              position: 'bottom'
+
+            }
+
+          }
+
+        }
+
+      });
+
+    }
+
+   
+
+    /* UI events */
+
+    document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", (e)=>{
+
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+
+      e.currentTarget.classList.add("active");
+
+      const tab = e.currentTarget.dataset.tab;
+
+      document.querySelectorAll("main section").forEach(s => s.style.display = s.id === tab ? "" : "none");
+
+    }));
+
+   
+
+    document.getElementById("fromDate").addEventListener("change", applyFilters);
+
+    document.getElementById("toDate").addEventListener("change", applyFilters);
+
+    document.getElementById("regionFilter").addEventListener("change", applyFilters);
+
+    document.getElementById("empSearch").addEventListener("input", () => { setTimeout(applyFilters, 200); });
+
+   
+
+    document.getElementById("refreshBtn").addEventListener("click", loadData);
+
+    document.getElementById("downloadBtn").addEventListener("click", ()=> window.open(CSV_URL, "_blank"));
+
+   
+
+    document.getElementById("empViewBtn").addEventListener("click", ()=> {
+
+      const name = document.getElementById("empNameInput").value.trim();
+
+      if (name) {
+
+        // switch tab to employee
+
+        document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+
+        document.querySelector('.tab[data-tab="employee"]').classList.add("active");
+
+        document.querySelectorAll("main section").forEach(s => s.style.display = s.id === "employee" ? "" : "none");
+
+        renderEmployeeView(name);
+
+      } else alert("Type employee name first");
+
+    });
+
+   
+
+    document.getElementById("empNameInput").addEventListener("keypress", (e) => {
+
+      if (e.key === "Enter") document.getElementById("empViewBtn").click();
+
+    });
+
+   
+
+    /* Set today as default to date */
+
+    const today = new Date();
+
+    document.getElementById("toDate").value = today.toISOString().split('T')[0];
+
+   
+
+    const weekAgo = new Date();
+
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    document.getElementById("fromDate").value = weekAgo.toISOString().split('T')[0];
+
+   
+
+    /* Add animation to cards */
+
+    document.querySelectorAll('.card').forEach((card, index) => {
+
+      card.style.animationDelay = `${index * 0.1}s`;
+
+      card.classList.add('animate');
+
+    });
+
+   
+
+    /* Initial load */
+
+    loadData();
+
+    setInterval(loadData, AUTO_REFRESH_MS);
+
+  </script>
+
+</body>
+
+</html>
